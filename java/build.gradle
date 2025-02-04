@@ -1,0 +1,28 @@
+plugins {
+    id 'application'
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    // Specify the fully-qualified name of your main class.
+    // If your main class is in the default package, you can simply use "CpuPowerMonitor"
+    mainClassName = 'get_cpu_power_usage'
+}
+
+// Configure the JAR task to produce an executable fat JAR.
+jar {
+    manifest {
+        attributes 'Main-Class': application.mainClassName
+    }
+    // Include runtime dependencies in the JAR
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    // Optionally, you can rename the jar archive:
+    archiveBaseName.set('get-cpu-power-usage')
+    archiveVersion.set('1.0')
+}
