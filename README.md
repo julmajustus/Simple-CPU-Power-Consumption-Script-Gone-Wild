@@ -205,3 +205,6 @@ Benchmark 7 (273 runs): java java/src/main/java/get_cpu_power_usage.java
   branch_misses      45.8M  ±  505K     44.1M  … 46.8M          19 ( 7%)        💩+1904108.0% ± 539.3%
 
 ```
+
+## Verdict 
+I'm really surprised about Zig's performance out of the box.
