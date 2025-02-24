@@ -1,35 +1,70 @@
-# get_cpu_power_usage
-Simple cpu power consuption script gone wild. It turned out to be a performance competition with diffrent languages, which can provide the fastest binary. I benchmarked the binaries with [poop](https://github.com/andrewrk/poop). I used `poop -d 60000` to run each benchmark for 60seconds.
+# Simple CPU Power Consumption Script Gone Wild
+This repository contains a performance competition among different languages to provide the fastest binary for a CPU power consumption script. I benchmarked the binaries using [poop](https://github.com/andrewrk/poop) by running each benchmark for 60 seconds:
 
+```sh
+poop -d 60000
+```
 
-`I'm not a master of any of the languages, so I relied on help of AI with languages like GO, Rust and ASM.`
+`I'm not a master of any of the languages, so I relied on the help of AI for languages like Go, Rust, and ASM.`
 
 ### Compiling
-I tried to compile binaries with default compiler settings and with possible compiler optimizations I could find.
+I compiled the binaries using both the default compiler settings and with various optimizations.
 
-- **C & CPP**
-  - default: gcc/g++
-  - optimizations: gcc/g++ -O3 -march=native -flto
-  - nolibc: gcc -nostdlib -static -O3 -march=native -flto
+- **C & C++**
+  - default:
+  ```
+  gcc get_cpu_power_usage.c -o get_cpu_power_usageC
+  g++ get_cpu_power_usage.cpp -o get_cpu_power_usageCPP
+  ```
+  - optimizations:
+  ```
+  gcc -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usageC_opt
+  g++ -O3 -march=native -flto get_cpu_power_usage.cpp -o get_cpu_power_usageCPP_opt
+  ```
+  - nolibc:
+  ```
+  gcc -nostdlib -static -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usageC_nolibc
+  ```
 
 - **GO**
-  - default: go build ./get_cpu_power_usage.go
-  - optimizations: go build -ldflags="-s -w" -trimpath `This did not provide good results.`
+  - default:
+  ```
+  go build -o get_cpu_power_usageGO ./get_cpu_power_usage.go
+  ```
+  - optimizations:
+  ```
+  go build -ldflags="-s -w" -trimpath -o get_cpu_power_usageGO_opt ./get_cpu_power_usage.go
+  ```
+  `This did not provide good results.`
 
 - **Rust**
-  - default: rustc get_cpu_power_usage.rs 
-  - optimizations: rustc -C opt-level=3 -C lto=thin -C target-cpu=native -C codegen-units=1 -C panic=abort
+  - default:
+  ```
+  rustc get_cpu_power_usage.rs -o get_cpu_power_usageRS
+  ```
+  - optimizations:
+  ```
+  rustc -C opt-level=3 -C lto=thin -C target-cpu=native -C codegen-units=1 -C panic=abort get_cpu_power_usage.rs -o get_cpu_power_usageRS_opt
+  ```
 
 - **Zig**
-  - default: zig build-exe get_cpu_power_usage.zig
-  - optimizations: zig build-exe -O ReleaseFast get_cpu_power_usage.zig
+  - default:
+  ```
+  zig build-exe get_cpu_power_usage.zig
+  ```
+  - optimizations:
+  ```
+  zig build-exe -O ReleaseFast get_cpu_power_usage.zig
+  ```
 
 - **ASM**
-  - nasm -f elf64 get_cpu_power_usage.asm -o get_cpu_power_usage.o
-  - ld -o get_cpu_power_usageASM get_cpu_power_usage.o
+  ```
+  nasm -f elf64 get_cpu_power_usage.asm -o get_cpu_power_usage.o
+  ld -o get_cpu_power_usageASM get_cpu_power_usage.o
+  ```
 
 
-
+---
 
 ```code
 Benchmark 1 (5873 runs): ./get_cpu_power_usageASM
