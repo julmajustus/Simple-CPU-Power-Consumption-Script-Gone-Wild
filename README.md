@@ -66,6 +66,10 @@ I compiled the binaries using both the default compiler settings and with variou
 
 ---
 
+![Benchmark](initialrun.png)
+<details>
+<summary>Text version of benchmarks</summary>
+
 ```code
 Benchmark 1 (5873 runs): ./get_cpu_power_usageASM
   measurement          mean ± σ            min … max           outliers         delta
@@ -185,6 +189,8 @@ Benchmark 13 (582 runs): ./get_cpu_power_usage.sh
   cache_misses       71.4K  ± 1.96K     64.3K  … 77.5K           8 ( 1%)        💩+549347.0% ± 385.1%
   branch_misses      43.0K  ±  343      41.5K  … 43.9K          13 ( 2%)        💩+388113.7% ± 79.1%
 ```
+</details>
+
 **I excluded java from the competition for reasons.**   
 `aka I just could not figure out how to get binaries out of java code, so it was not fair to include it to the chart.`
 ```
