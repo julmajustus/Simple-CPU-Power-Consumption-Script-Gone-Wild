@@ -17,13 +17,13 @@ public class get_cpu_power_usage {
             System.err.println("Failed to parse energy value");
             System.exit(1);
         }
-        return 0; // Unreachable
+        return 0;
     }
 
     public static void main(String[] args) {
         long initialEnergy = getCpuEnergy();
         try {
-            Thread.sleep(10); // Sleep for 10 milliseconds
+            Thread.sleep(10);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

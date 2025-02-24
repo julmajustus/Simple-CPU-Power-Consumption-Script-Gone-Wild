@@ -32,7 +32,6 @@ func main() {
 	finalEnergy := getCPUEnergy()
 	energyDiff := finalEnergy - initialEnergy
 
-	// Convert microjoules to joules and compute power (since interval is 0.01 seconds)
 	energyDiffJoules := float64(energyDiff) / 1e6
 	powerUsage := energyDiffJoules / 0.01
 
