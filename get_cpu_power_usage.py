@@ -9,11 +9,11 @@ def get_energy():
 
 def main():
     initial_energy = get_energy()
-    time.sleep(0.1)
+    time.sleep(0.01)
     final_energy = get_energy()
     energy_diff = final_energy - initial_energy
     energy_diff_joules = energy_diff / 1_000_000
-    power_usage = energy_diff_joules / 0.1
+    power_usage = energy_diff_joules / 0.01
 
     print(f"{power_usage:.1f}")
 

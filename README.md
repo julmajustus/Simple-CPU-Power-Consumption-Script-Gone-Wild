@@ -312,24 +312,24 @@ Benchmark 24 (5854 runs): ./get_cpu_power_usageZIG_optimized
   cache_references    527   ± 53.8       317   …  764           59 ( 1%)        ⚡- 95.1% ±  0.1%
   cache_misses        221   ± 68.8        48   …  416            0 ( 0%)        ⚡- 95.0% ±  0.2%
   branch_misses      86.1   ± 16.0        40   …  112            0 ( 0%)        ⚡- 96.4% ±  0.0%
-Benchmark 25 (564 runs): ./get_cpu_power_usage.py
+Benchmark 25 (3698 runs): ./get_cpu_power_usage.py
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time           107ms ±  583us     105ms …  115ms          3 ( 1%)        💩+932.6% ±  0.2%
-  peak_rss           11.1MB ±  217KB    9.95MB … 11.5MB         10 ( 2%)        💩+579.1% ±  0.6%
-  cpu_cycles         25.1M  ± 1.48M     22.1M  … 29.8M           3 ( 1%)        💩+15146.2% ± 23.1%
-  instructions       39.2M  ± 40.3K     39.1M  … 39.4M           3 ( 1%)        💩+30524.4% ±  0.8%
-  cache_references   1.96M  ± 24.7K     1.79M  … 2.04M           7 ( 1%)        💩+18279.6% ±  6.0%
-  cache_misses        252K  ± 12.3K      229K  …  292K           3 ( 1%)        💩+5583.3% ±  7.1%
-  branch_misses       349K  ± 3.66K      342K  …  368K          13 ( 2%)        💩+14477.8% ±  3.9%
-Benchmark 26 (581 runs): ./get_cpu_power_usage.sh
+  wall_time          16.2ms ±  492us    15.1ms … 18.5ms         11 ( 0%)        💩+ 56.6% ±  0.1%
+  peak_rss           11.0MB ±  247KB    9.62MB … 11.5MB        122 ( 3%)        💩+574.2% ±  0.4%
+  cpu_cycles         24.4M  ± 1.44M     22.1M  … 29.9M           4 ( 0%)        💩+13910.8% ± 21.2%
+  instructions       39.2M  ± 38.8K     39.1M  … 39.4M          33 ( 1%)        💩+30524.3% ±  0.8%
+  cache_references   1.96M  ± 28.8K     1.90M  … 2.15M          65 ( 2%)        💩+18166.2% ±  6.9%
+  cache_misses        256K  ± 14.6K      228K  …  321K           4 ( 0%)        💩+5512.1% ±  8.2%
+  branch_misses       349K  ± 4.01K      342K  …  367K          75 ( 2%)        💩+14508.0% ±  4.3%
+Benchmark 26 (4571 runs): ./get_cpu_power_usage.sh
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time           103ms ±  263us     102ms …  104ms         13 ( 2%)        💩+901.3% ±  0.1%
-  peak_rss           5.03MB ±  133KB    4.46MB … 5.30MB         44 ( 8%)        💩+208.4% ±  0.5%
-  cpu_cycles         4.04M  ±  287K     3.12M  … 5.19M          24 ( 4%)        💩+2358.6% ±  4.6%
-  instructions       4.47M  ±  301      4.47M  … 4.47M          42 ( 7%)        💩+3387.6% ±  0.0%
-  cache_references    199K  ± 4.06K      188K  …  218K          19 ( 3%)        💩+1772.9% ±  1.0%
-  cache_misses       72.6K  ± 2.36K     65.1K  … 78.1K           6 ( 1%)        💩+1540.5% ±  1.5%
-  branch_misses      43.1K  ±  358      41.6K  … 43.9K          13 ( 2%)        💩+1702.5% ±  0.4%
+  wall_time          13.1ms ±  191us    12.3ms … 14.2ms         57 ( 1%)        💩+ 26.7% ±  0.1%
+  peak_rss           5.04MB ±  129KB    4.37MB … 5.36MB        407 ( 9%)        💩+208.2% ±  0.3%
+  cpu_cycles         3.67M  ±  153K     3.13M  … 4.52M         132 ( 3%)        💩+2003.8% ±  2.4%
+  instructions       4.47M  ±  288      4.47M  … 4.47M         258 ( 6%)        💩+3387.9% ±  0.0%
+  cache_references    199K  ± 3.39K      185K  …  222K         169 ( 4%)        💩+1748.1% ±  0.8%
+  cache_misses       72.1K  ± 2.16K     62.1K  … 80.0K          98 ( 2%)        💩+1481.3% ±  1.2%
+  branch_misses      43.1K  ±  343      41.4K  … 44.2K         113 ( 2%)        💩+1704.4% ±  0.4%
 Benchmark 27 (5867 runs): ./get_cpu_power_usageASM
   measurement          mean ± σ            min … max           outliers         delta
   wall_time          10.2ms ± 28.7us    10.1ms … 11.3ms        120 ( 2%)          -  1.0% ±  0.0%
