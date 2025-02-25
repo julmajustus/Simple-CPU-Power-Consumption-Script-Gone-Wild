@@ -11,50 +11,75 @@ poop -d 60000
 I compiled the binaries using both the default compiler settings and with various optimizations.
 
 - **C & C++**
+  - Compiler versions:
+  ```
+  gcc (Gentoo 14.2.1_p20241221 p7) 14.2.1 20241221
+  clang version 19.1.7
+  ```
   - default:
   ```
   gcc get_cpu_power_usage.c -o get_cpu_power_usageC
+  clang get_cpu_power_usage.c -o get_cpu_power_usageC
   g++ get_cpu_power_usage.cpp -o get_cpu_power_usageCPP
+  c++ get_cpu_power_usage.cpp -o get_cpu_power_usageCPP
   ```
   - optimizations:
   ```
-  gcc -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usageC_opt
-  g++ -O3 -march=native -flto get_cpu_power_usage.cpp -o get_cpu_power_usageCPP_opt
+  gcc -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usageC_optimized
+  clang -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usageC_optimized
+  g++ -O3 -march=native -flto get_cpu_power_usage.cpp -o get_cpu_power_usageCPP_optimized
+  c++ -O3 -march=native -flto get_cpu_power_usage.cpp -o get_cpu_power_usageCPP_optimized
   ```
   - nolibc:
   ```
-  gcc -nostdlib -static -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usageC_nolibc
+  gcc -nostdlib -static get_cpu_power_usageC_nolibc -o get_cpu_power_usage_nolibcC
+  clang -nostdlib -static -fno-stack-protector get_cpu_power_usageC_nolibc -o get_cpu_power_usage_nolibcC
+  gcc -nostdlib -static -O3 -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usage_nolibcC_optimized
+  clang -nostdlib -static -fno-stack-protector -ffast-math -march=native -flto get_cpu_power_usage.c -o get_cpu_power_usage_nolibcC_optimized
   ```
+  `nolibc compiled with clang segfaulted with any -O flags`
 
 - **GO**
+  - Compiler versions:
+  ```
+  go version go1.23.6 linux/amd64
+  ```
   - default:
   ```
   go build -o get_cpu_power_usageGO ./get_cpu_power_usage.go
   ```
   - optimizations:
   ```
-  go build -ldflags="-s -w" -trimpath -o get_cpu_power_usageGO_opt ./get_cpu_power_usage.go
+  go build -ldflags="-s -w" -trimpath -o get_cpu_power_usageGO_optimized ./get_cpu_power_usage.go
   ```
   `This did not provide good results.`
 
 - **Rust**
+  - Compiler versions:
+  ```
+  rustc 1.84.1 (e71f9a9a9 2025-01-27)
+  ```
   - default:
   ```
   rustc get_cpu_power_usage.rs -o get_cpu_power_usageRS
   ```
   - optimizations:
   ```
-  rustc -C opt-level=3 -C lto=thin -C target-cpu=native -C codegen-units=1 -C panic=abort get_cpu_power_usage.rs -o get_cpu_power_usageRS_opt
+  rustc -C opt-level=3 -C lto=thin -C target-cpu=native -C codegen-units=1 -C panic=abort get_cpu_power_usage.rs -o get_cpu_power_usageRS_optimized
   ```
 
 - **Zig**
+  - Compiler versions:
+  ```
+  0.14.0-dev.2567+497592c9b
+  ```
   - default:
   ```
-  zig build-exe get_cpu_power_usage.zig
+  zig build-exe get_cpu_power_usage.zig --name get_cpu_power_usageZIG
   ```
   - optimizations:
   ```
-  zig build-exe -O ReleaseFast get_cpu_power_usage.zig
+  zig build-exe -O ReleaseFast get_cpu_power_usage.zig --name get_cpu_power_usageZIG_optimized
   ```
 
 - **ASM**
@@ -71,123 +96,249 @@ I compiled the binaries using both the default compiler settings and with variou
 <summary>Text version of benchmarks</summary>
 
 ```code
-Benchmark 1 (5873 runs): ./get_cpu_power_usageASM
+Benchmark 1 (5808 runs): ./get_cpu_power_usageC_gcc
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.2ms ± 19.7us    10.1ms … 10.4ms        141 ( 2%)        0%
-  peak_rss            949KB ± 20.7KB     553KB …  950KB         35 ( 1%)        0%
-  cpu_cycles         1.24K  ±  327       916   … 7.27K         406 ( 7%)        0%
-  instructions        522   ± 0.07       522   …  523           32 ( 1%)        0%
-  cache_references    122   ± 23.6        34   …  243           39 ( 1%)        0%
-  cache_misses       13.0   ± 14.6         0   …  116          342 ( 6%)        0%
-  branch_misses      11.1   ± 2.35         8   …   26          255 ( 4%)        0%
-Benchmark 2 (5802 runs): ./get_cpu_power_usageC
+  wall_time          10.3ms ± 48.0us    10.2ms … 10.5ms        426 ( 7%)        0%
+  peak_rss           1.63MB ± 99.2KB    1.12MB … 1.73MB        962 (17%)        0%
+  cpu_cycles          164K  ± 17.1K      148K  …  324K         834 (14%)        0%
+  instructions        128K  ± 22.3       128K  …  128K           0 ( 0%)        0%
+  cache_references   10.6K  ±  335      9.98K  … 13.0K         333 ( 6%)        0%
+  cache_misses       4.43K  ±  258      3.30K  … 6.18K         359 ( 6%)        0%
+  branch_misses      2.39K  ± 39.0      2.08K  … 2.68K         173 ( 3%)        0%
+Benchmark 2 (5813 runs): ./get_cpu_power_usageC_clang
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.3ms ± 54.2us    10.3ms … 11.2ms        139 ( 2%)        💩+  1.3% ±  0.0%
-  peak_rss           1.63MB ± 99.4KB    1.11MB … 1.75MB        967 (17%)        💩+ 72.0% ±  0.3%
-  cpu_cycles          167K  ± 24.8K      149K  …  353K         773 (13%)        💩+13322.6% ± 51.1%
-  instructions        128K  ± 22.5       128K  …  128K           1 ( 0%)        💩+24440.6% ±  0.1%
-  cache_references   10.7K  ±  332      9.84K  … 14.3K         324 ( 6%)        💩+8645.9% ±  7.0%
-  cache_misses       4.47K  ±  265      3.77K  … 6.43K         487 ( 8%)        💩+34280.6% ± 52.1%
-  branch_misses      2.39K  ± 40.2      1.98K  … 2.56K         162 ( 3%)        💩+21470.1% ±  9.3%
-Benchmark 3 (5801 runs): ./get_cpu_power_usageC_optimized
+  wall_time          10.3ms ± 45.8us    10.2ms … 10.7ms        707 (12%)          -  0.1% ±  0.0%
+  peak_rss           1.63MB ± 99.1KB    1.11MB … 1.72MB        945 (16%)          +  0.1% ±  0.2%
+  cpu_cycles          164K  ± 18.0K      150K  …  357K         798 (14%)          -  0.3% ±  0.4%
+  instructions        128K  ± 22.6       128K  …  128K           0 ( 0%)          +  0.0% ±  0.0%
+  cache_references   10.6K  ±  313      9.96K  … 13.5K         361 ( 6%)          -  0.7% ±  0.1%
+  cache_misses       4.41K  ±  245      3.46K  … 6.49K         330 ( 6%)          -  0.4% ±  0.2%
+  branch_misses      2.38K  ± 40.7      1.97K  … 2.58K         185 ( 3%)          -  0.4% ±  0.1%
+Benchmark 3 (5813 runs): ./get_cpu_power_usageC_gcc_optimized
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.3ms ± 54.9us    10.2ms … 10.9ms        102 ( 2%)        💩+  1.3% ±  0.0%
-  peak_rss           1.63MB ± 98.8KB    1.11MB … 1.72MB        935 (16%)        💩+ 72.2% ±  0.3%
-  cpu_cycles          168K  ± 27.4K      149K  …  389K         930 (16%)        💩+13414.3% ± 56.3%
-  instructions        128K  ± 24.2       128K  …  129K          14 ( 0%)        💩+24480.4% ±  0.1%
-  cache_references   10.6K  ±  333      9.87K  … 13.1K         393 ( 7%)        💩+8609.6% ±  7.0%
-  cache_misses       4.48K  ±  255      3.58K  … 6.25K         566 (10%)        💩+34355.0% ± 50.3%
-  branch_misses      2.39K  ± 39.8      1.97K  … 2.58K         183 ( 3%)        💩+21441.3% ±  9.2%
-Benchmark 4 (5873 runs): ./get_cpu_power_usage_nolibcC
+  wall_time          10.3ms ± 46.7us    10.2ms … 10.8ms        457 ( 8%)          -  0.0% ±  0.0%
+  peak_rss           1.63MB ± 99.7KB    1.09MB … 1.72MB        966 (17%)          +  0.0% ±  0.2%
+  cpu_cycles          164K  ± 15.9K      147K  …  349K         837 (14%)          -  0.5% ±  0.4%
+  instructions        128K  ± 22.7       128K  …  128K           1 ( 0%)          +  0.2% ±  0.0%
+  cache_references   10.5K  ±  322      9.90K  … 12.7K         344 ( 6%)        ⚡-  1.2% ±  0.1%
+  cache_misses       4.40K  ±  253      3.44K  … 6.31K         385 ( 7%)          -  0.5% ±  0.2%
+  branch_misses      2.39K  ± 40.8      1.93K  … 2.55K         174 ( 3%)          -  0.2% ±  0.1%
+Benchmark 4 (5811 runs): ./get_cpu_power_usageC_clang_optimized
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.2ms ± 20.2us    10.1ms … 10.3ms        146 ( 2%)          +  0.0% ±  0.0%
-  peak_rss            978KB ± 19.8KB     668KB …  979KB         37 ( 1%)        💩+  3.0% ±  0.1%
-  cpu_cycles         1.95K  ±  563      1.32K  … 9.15K         428 ( 7%)        💩+ 56.9% ±  1.3%
-  instructions       1.16K  ± 0.77      1.16K  … 1.20K         650 (11%)        💩+122.2% ±  0.0%
-  cache_references    114   ± 30.7        69   …  381          533 ( 9%)        ⚡-  6.8% ±  0.8%
-  cache_misses       16.8   ± 16.5         0   …  157          431 ( 7%)        💩+ 29.4% ±  4.3%
-  branch_misses      20.8   ± 4.18        16   …   35          166 ( 3%)        💩+ 87.4% ±  1.1%
-Benchmark 5 (5873 runs): ./get_cpu_power_usage_nolibcC_optimized
+  wall_time          10.3ms ± 47.3us    10.2ms … 10.6ms        369 ( 6%)          -  0.0% ±  0.0%
+  peak_rss           1.63MB ± 99.1KB    1.11MB … 1.73MB        950 (16%)          +  0.1% ±  0.2%
+  cpu_cycles          165K  ± 17.3K      146K  …  336K         776 (13%)          +  0.2% ±  0.4%
+  instructions        129K  ± 23.4       129K  …  129K           7 ( 0%)          +  0.5% ±  0.0%
+  cache_references   10.6K  ±  336      9.82K  … 15.0K         310 ( 5%)          -  0.4% ±  0.1%
+  cache_misses       4.42K  ±  259      3.20K  … 6.31K         341 ( 6%)          -  0.1% ±  0.2%
+  branch_misses      2.39K  ± 43.0      1.94K  … 2.60K         195 ( 3%)          +  0.0% ±  0.1%
+Benchmark 5 (5798 runs): ./get_cpu_power_usageC_gcc_optimized_no_lto
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.2ms ± 19.4us    10.1ms … 10.3ms        153 ( 3%)          +  0.0% ±  0.0%
-  peak_rss            977KB ± 20.7KB     668KB …  979KB         38 ( 1%)        💩+  3.0% ±  0.1%
-  cpu_cycles         1.18K  ±  313       828   … 5.00K         469 ( 8%)        ⚡-  4.7% ±  0.9%
-  instructions        490   ± 0.23       490   …  491          331 ( 6%)        ⚡-  6.1% ±  0.0%
-  cache_references    142   ± 27.8        56   …  244           30 ( 1%)        💩+ 16.3% ±  0.8%
-  cache_misses       11.8   ± 14.0         0   …  116          519 ( 9%)        ⚡-  9.4% ±  4.0%
-  branch_misses      13.0   ± 3.65        10   …   27          182 ( 3%)        💩+ 17.1% ±  1.0%
-Benchmark 6 (5595 runs): ./get_cpu_power_usageGO
+  wall_time          10.3ms ± 56.8us    10.2ms … 11.0ms         64 ( 1%)          +  0.2% ±  0.0%
+  peak_rss           1.63MB ± 99.0KB    1.12MB … 1.72MB        964 (17%)          +  0.1% ±  0.2%
+  cpu_cycles          169K  ± 28.8K      146K  …  374K         910 (16%)        💩+  2.7% ±  0.5%
+  instructions        128K  ± 29.9       128K  …  129K          67 ( 1%)          +  0.1% ±  0.0%
+  cache_references   10.6K  ±  357      9.80K  … 13.5K         387 ( 7%)          +  0.0% ±  0.1%
+  cache_misses       4.49K  ±  281      3.25K  … 6.39K         440 ( 8%)        💩+  1.3% ±  0.2%
+  branch_misses      2.39K  ± 40.2      2.01K  … 2.62K         176 ( 3%)          +  0.0% ±  0.1%
+Benchmark 6 (5789 runs): ./get_cpu_power_usageC_clang_optimized_no_lto
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.7ms ± 77.5us    10.5ms … 11.1ms         30 ( 1%)        💩+  5.0% ±  0.0%
-  peak_rss           3.68MB ±  195KB    2.98MB … 5.91MB       2012 (36%)        💩+288.1% ±  0.5%
-  cpu_cycles          463K  ± 49.2K      351K  …  778K         383 ( 7%)        💩+37136.5% ± 101.4%
-  instructions        537K  ± 11.5K      496K  …  607K         112 ( 2%)        💩+102857.5% ± 56.2%
-  cache_references   42.6K  ± 2.51K     36.5K  … 53.7K         108 ( 2%)        💩+34852.4% ± 52.7%
-  cache_misses       13.9K  ± 1.57K     9.98K  … 21.1K         204 ( 4%)        💩+106703.2% ± 308.9%
-  branch_misses      3.74K  ±  409      2.83K  … 5.17K          71 ( 1%)        💩+33644.7% ± 94.3%
-Benchmark 7 (5590 runs): ./get_cpu_power_usageGO_optimized
+  wall_time          10.3ms ± 63.6us    10.3ms … 10.8ms         60 ( 1%)          +  0.3% ±  0.0%
+  peak_rss           1.63MB ±  101KB    1.11MB … 1.72MB       1003 (17%)          -  0.1% ±  0.2%
+  cpu_cycles          173K  ± 37.6K      148K  …  573K         844 (15%)        💩+  5.3% ±  0.6%
+  instructions        129K  ± 25.0       129K  …  129K          21 ( 0%)          +  0.4% ±  0.0%
+  cache_references   10.7K  ±  450      9.30K  … 13.4K         402 ( 7%)          +  0.6% ±  0.1%
+  cache_misses       4.53K  ±  307      3.78K  … 6.39K         251 ( 4%)        💩+  2.2% ±  0.2%
+  branch_misses      2.39K  ± 39.4      1.98K  … 2.55K         130 ( 2%)          -  0.2% ±  0.1%
+Benchmark 7 (5870 runs): ./get_cpu_power_usage_nolibcC_gcc
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.7ms ± 75.9us    10.5ms … 11.2ms         30 ( 1%)        💩+  5.1% ±  0.0%
-  peak_rss           3.68MB ±  204KB    2.98MB … 5.91MB       1952 (35%)        💩+288.3% ±  0.6%
-  cpu_cycles          472K  ± 49.0K      356K  …  710K         304 ( 5%)        💩+37899.0% ± 100.9%
-  instructions        538K  ± 11.4K      492K  …  603K         132 ( 2%)        💩+102891.7% ± 55.8%
-  cache_references   43.2K  ± 2.56K     35.5K  … 54.0K         154 ( 3%)        💩+35276.5% ± 53.7%
-  cache_misses       13.9K  ± 1.68K     9.94K  … 21.6K         215 ( 4%)        💩+107088.8% ± 330.5%
-  branch_misses      3.80K  ±  400      2.78K  … 5.41K          62 ( 1%)        💩+34140.1% ± 92.3%
-Benchmark 8 (5761 runs): ./get_cpu_power_usageRS
+  wall_time          10.2ms ± 22.1us    10.1ms … 10.4ms        160 ( 3%)        ⚡-  1.0% ±  0.0%
+  peak_rss            924KB ± 21.7KB     614KB …  987KB         37 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         2.09K  ±  659      1.30K  … 9.82K         449 ( 8%)        ⚡- 98.7% ±  0.3%
+  instructions       1.16K  ± 0.32      1.16K  … 1.16K         660 (11%)        ⚡- 99.1% ±  0.0%
+  cache_references    118   ± 29.8        67   …  387          276 ( 5%)        ⚡- 98.9% ±  0.1%
+  cache_misses       22.5   ± 17.3         0   …  179          265 ( 5%)        ⚡- 99.5% ±  0.1%
+  branch_misses      21.9   ± 4.53        16   …   36            2 ( 0%)        ⚡- 99.1% ±  0.0%
+Benchmark 8 (5869 runs): ./get_cpu_power_usage_nolibcC_clang
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.4ms ± 70.6us    10.3ms … 10.8ms         96 ( 2%)        💩+  2.0% ±  0.0%
-  peak_rss           2.05MB ± 78.9KB    1.45MB … 2.22MB        413 ( 7%)        💩+116.1% ±  0.2%
-  cpu_cycles          277K  ± 38.1K      250K  …  523K         809 (14%)        💩+22229.8% ± 78.5%
-  instructions        303K  ±  335       303K  …  306K          49 ( 1%)        💩+58024.4% ±  1.6%
-  cache_references   18.0K  ±  650      16.9K  … 23.3K         532 ( 9%)        💩+14648.5% ± 13.6%
-  cache_misses       6.75K  ±  521      5.57K  … 9.70K         459 ( 8%)        💩+51836.1% ± 102.5%
-  branch_misses      3.80K  ± 56.9      3.16K  … 4.05K         220 ( 4%)        💩+34198.4% ± 13.1%
-Benchmark 9 (5766 runs): ./get_cpu_power_usageRS_optimized
+  wall_time          10.2ms ± 24.9us    10.1ms … 10.6ms        141 ( 2%)        ⚡-  1.0% ±  0.0%
+  peak_rss            924KB ± 20.5KB     614KB …  926KB         35 ( 1%)        ⚡- 43.3% ±  0.2%
+  cpu_cycles         2.19K  ±  735      1.37K  … 9.54K         420 ( 7%)        ⚡- 98.7% ±  0.3%
+  instructions       1.15K  ± 3.35      1.15K  … 1.18K         725 (12%)        ⚡- 99.1% ±  0.0%
+  cache_references    139   ± 32.4        83   …  321          218 ( 4%)        ⚡- 98.7% ±  0.1%
+  cache_misses       28.2   ± 21.4         0   …  143          115 ( 2%)        ⚡- 99.4% ±  0.1%
+  branch_misses      20.2   ± 4.42        16   …   35           10 ( 0%)        ⚡- 99.2% ±  0.0%
+Benchmark 9 (5871 runs): ./get_cpu_power_usage_nolibcC_gcc_optimized
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.4ms ± 70.0us    10.3ms … 11.4ms        154 ( 3%)        💩+  1.9% ±  0.0%
-  peak_rss           2.02MB ± 95.3KB    1.50MB … 2.21MB        745 (13%)        💩+112.7% ±  0.3%
-  cpu_cycles          265K  ± 34.5K      239K  …  512K         885 (15%)        💩+21262.0% ± 70.9%
-  instructions        297K  ±  331       296K  …  299K          35 ( 1%)        💩+56717.8% ±  1.6%
-  cache_references   17.3K  ±  572      16.1K  … 21.1K         442 ( 8%)        💩+14053.9% ± 12.0%
-  cache_misses       6.33K  ±  417      5.13K  … 8.91K         562 (10%)        💩+48627.0% ± 82.1%
-  branch_misses      3.68K  ± 52.1      3.08K  … 3.93K         170 ( 3%)        💩+33067.4% ± 12.0%
-Benchmark 10 (5833 runs): ./get_cpu_power_usageZIG
+  wall_time          10.2ms ± 25.8us    10.1ms … 10.4ms        163 ( 3%)        ⚡-  1.1% ±  0.0%
+  peak_rss            923KB ± 26.8KB     610KB …  926KB         57 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         1.33K  ±  531       818   … 6.85K         460 ( 8%)        ⚡- 99.2% ±  0.3%
+  instructions        490   ± 2.62       490   …  514          391 ( 7%)        ⚡- 99.6% ±  0.0%
+  cache_references    137   ± 27.8        49   …  245           41 ( 1%)        ⚡- 98.7% ±  0.1%
+  cache_misses       22.7   ± 20.0         0   …  139          187 ( 3%)        ⚡- 99.5% ±  0.1%
+  branch_misses      15.3   ± 5.03        10   …   28            0 ( 0%)        ⚡- 99.4% ±  0.0%
+Benchmark 10 (5868 runs): ./get_cpu_power_usage_nolibcC_clang_optimized
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.3ms ± 30.7us    10.2ms … 10.4ms        304 ( 5%)          +  0.7% ±  0.0%
-  peak_rss            976KB ± 27.0KB     668KB …  979KB         69 ( 1%)        💩+  2.9% ±  0.1%
-  cpu_cycles         48.6K  ± 7.01K     35.8K  … 88.0K          39 ( 1%)        💩+3812.8% ± 14.4%
-  instructions       26.0K  ±  169      25.7K  … 26.3K        1852 (32%)        💩+4879.6% ±  0.8%
-  cache_references   3.88K  ±  433      2.89K  … 5.64K           4 ( 0%)        💩+3082.6% ±  9.1%
-  cache_misses       1.44K  ±  315       575   … 2.77K           1 ( 0%)        💩+11008.3% ± 62.1%
-  branch_misses       353   ± 93.8       185   …  538            0 ( 0%)        💩+3087.9% ± 21.6%
-Benchmark 11 (5861 runs): ./get_cpu_power_usageZIG_optimized
+  wall_time          10.2ms ± 23.4us    10.1ms … 10.4ms        117 ( 2%)          -  1.0% ±  0.0%
+  peak_rss            924KB ± 21.0KB     614KB …  987KB         36 ( 1%)        ⚡- 43.3% ±  0.2%
+  cpu_cycles         2.31K  ±  781      1.42K  … 11.1K         448 ( 8%)        ⚡- 98.6% ±  0.3%
+  instructions       1.11K  ± 1.69      1.11K  … 1.15K         652 (11%)        ⚡- 99.1% ±  0.0%
+  cache_references    132   ± 31.8        76   …  353          212 ( 4%)        ⚡- 98.8% ±  0.1%
+  cache_misses       26.7   ± 19.8         0   …  174          123 ( 2%)        ⚡- 99.4% ±  0.1%
+  branch_misses      22.7   ± 3.14        16   …   31            0 ( 0%)        ⚡- 99.1% ±  0.0%
+Benchmark 11 (5866 runs): ./get_cpu_power_usage_nolibcC_gcc_optimized_no_lto
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time          10.2ms ± 24.9us    10.1ms … 10.4ms        255 ( 4%)          +  0.2% ±  0.0%
-  peak_rss            977KB ± 26.6KB     614KB …  979KB         66 ( 1%)        💩+  2.9% ±  0.1%
-  cpu_cycles         6.53K  ±  933      4.67K  … 14.4K          97 ( 2%)        💩+425.9% ±  2.0%
-  instructions       2.56K  ±  117      2.32K  … 2.76K        1886 (32%)        💩+389.8% ±  0.6%
-  cache_references    519   ± 52.2       320   …  801           35 ( 1%)        💩+325.5% ±  1.2%
-  cache_misses        215   ± 67.8        52   …  417            0 ( 0%)        💩+1551.2% ± 13.6%
-  branch_misses      84.9   ± 16.3        40   …  111            0 ( 0%)        💩+665.8% ±  3.8%
-Benchmark 12 (565 runs): ./get_cpu_power_usage.py
+  wall_time          10.2ms ± 25.5us    10.1ms … 10.4ms        104 ( 2%)          -  1.0% ±  0.0%
+  peak_rss            924KB ± 24.2KB     614KB …  987KB         50 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         1.52K  ±  598       848   … 6.23K         489 ( 8%)        ⚡- 99.1% ±  0.3%
+  instructions        490   ± 2.04       490   …  514          353 ( 6%)        ⚡- 99.6% ±  0.0%
+  cache_references    142   ± 24.9        63   …  258          110 ( 2%)        ⚡- 98.7% ±  0.1%
+  cache_misses       32.7   ± 20.6         0   …  119           39 ( 1%)        ⚡- 99.3% ±  0.1%
+  branch_misses      17.7   ± 4.67        10   …   28            0 ( 0%)        ⚡- 99.3% ±  0.0%
+Benchmark 12 (5874 runs): ./get_cpu_power_usage_nolibcC_clang_optimized_no_lto
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time           106ms ±  478us     105ms …  108ms         53 ( 9%)        💩+941.8% ±  0.1%
-  peak_rss           11.0MB ±  228KB    10.1MB … 11.5MB         22 ( 4%)        💩+1061.6% ±  0.6%
-  cpu_cycles         24.6M  ± 1.30M     22.1M  … 28.1M           0 ( 0%)        💩+1978420.6% ± 2665.6%
-  instructions       39.2M  ± 41.6K     39.1M  … 39.4M           7 ( 1%)        💩+7515607.6% ± 203.8%
-  cache_references   1.96M  ± 23.5K     1.91M  … 2.05M           2 ( 0%)        💩+1607562.2% ± 492.9%
-  cache_misses        255K  ± 13.7K      230K  …  295K           2 ( 0%)        💩+1958452.4% ± 2692.7%
-  branch_misses       349K  ± 3.80K      342K  …  364K          14 ( 2%)        💩+3146080.6% ± 876.2%
-Benchmark 13 (582 runs): ./get_cpu_power_usage.sh
+  wall_time          10.2ms ± 20.8us    10.1ms … 10.5ms        122 ( 2%)        ⚡-  1.1% ±  0.0%
+  peak_rss            924KB ± 22.0KB     504KB …  987KB         45 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         2.06K  ±  525      1.43K  … 8.34K         284 ( 5%)        ⚡- 98.7% ±  0.3%
+  instructions       1.15K  ± 0.33      1.15K  … 1.15K         724 (12%)        ⚡- 99.1% ±  0.0%
+  cache_references    137   ± 28.1        84   …  316          268 ( 5%)        ⚡- 98.7% ±  0.1%
+  cache_misses       24.3   ± 17.4         0   …  141          269 ( 5%)        ⚡- 99.5% ±  0.1%
+  branch_misses      19.5   ± 3.83        16   …   34          436 ( 7%)        ⚡- 99.2% ±  0.0%
+Benchmark 13 (5603 runs): ./get_cpu_power_usageCPP_gcc
   measurement          mean ± σ            min … max           outliers         delta
-  wall_time           103ms ±  196us     103ms …  105ms         10 ( 2%)        💩+911.4% ±  0.1%
-  peak_rss           5.03MB ±  129KB    4.39MB … 5.21MB         23 ( 4%)        💩+429.6% ±  0.4%
-  cpu_cycles         3.78M  ±  179K     3.31M  … 4.52M          12 ( 2%)        💩+304268.9% ± 368.5%
-  instructions       4.47M  ±  269      4.47M  … 4.47M          11 ( 2%)        💩+855765.4% ±  1.3%
-  cache_references    198K  ± 3.13K      188K  …  217K          15 ( 3%)        💩+162250.2% ± 65.7%
-  cache_misses       71.4K  ± 1.96K     64.3K  … 77.5K           8 ( 1%)        💩+549347.0% ± 385.1%
-  branch_misses      43.0K  ±  343      41.5K  … 43.9K          13 ( 2%)        💩+388113.7% ± 79.1%
+  wall_time          10.7ms ±  143us    10.5ms … 12.4ms         48 ( 1%)        💩+  3.7% ±  0.0%
+  peak_rss           3.64MB ± 89.8KB    3.10MB … 3.91MB        452 ( 8%)        💩+123.3% ±  0.2%
+  cpu_cycles         1.32M  ±  258K     1.17M  … 2.76M        1054 (19%)        💩+705.1% ±  4.0%
+  instructions       2.53M  ± 23.3      2.53M  … 2.53M           9 ( 0%)        💩+1877.6% ±  0.0%
+  cache_references   57.7K  ± 3.39K     44.5K  …  104K         288 ( 5%)        💩+442.5% ±  0.8%
+  cache_misses       14.1K  ± 1.51K     11.8K  … 21.8K         363 ( 6%)        💩+219.5% ±  0.9%
+  branch_misses      14.0K  ±  110      12.8K  … 14.6K         251 ( 4%)        💩+487.1% ±  0.1%
+Benchmark 14 (5595 runs): ./get_cpu_power_usageCPP_clang
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.7ms ±  150us    10.5ms … 11.3ms         18 ( 0%)        💩+  3.8% ±  0.0%
+  peak_rss           3.65MB ± 86.0KB    3.14MB … 3.94MB        406 ( 7%)        💩+123.4% ±  0.2%
+  cpu_cycles         1.35M  ±  300K     1.17M  … 3.10M        1097 (20%)        💩+723.2% ±  4.7%
+  instructions       2.53M  ± 23.0      2.53M  … 2.53M           5 ( 0%)        💩+1877.6% ±  0.0%
+  cache_references   57.8K  ± 3.69K     54.2K  …  141K         399 ( 7%)        💩+442.8% ±  0.9%
+  cache_misses       14.2K  ± 1.36K     12.0K  … 21.8K         345 ( 6%)        💩+221.1% ±  0.8%
+  branch_misses      14.0K  ±  104      13.3K  … 14.7K         208 ( 4%)        💩+487.4% ±  0.1%
+Benchmark 15 (5576 runs): ./get_cpu_power_usageCPP_gcc_optimized
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.7ms ±  164us    10.5ms … 12.1ms         13 ( 0%)        💩+  4.2% ±  0.0%
+  peak_rss           3.64MB ± 94.1KB    3.07MB … 3.93MB        498 ( 9%)        💩+123.1% ±  0.2%
+  cpu_cycles         1.43M  ±  348K     1.19M  … 3.33M        1054 (19%)        💩+772.4% ±  5.4%
+  instructions       2.55M  ± 39.7      2.55M  … 2.55M         179 ( 3%)        💩+1893.0% ±  0.0%
+  cache_references   57.7K  ± 3.39K     46.5K  …  121K         223 ( 4%)        💩+442.5% ±  0.8%
+  cache_misses       14.2K  ± 1.53K     11.6K  … 20.7K         352 ( 6%)        💩+220.6% ±  0.9%
+  branch_misses      14.6K  ±  112      14.2K  … 15.2K         273 ( 5%)        💩+512.6% ±  0.1%
+Benchmark 16 (5569 runs): ./get_cpu_power_usageCPP_clang_optimized
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.8ms ±  162us    10.5ms … 11.9ms         10 ( 0%)        💩+  4.3% ±  0.0%
+  peak_rss           3.64MB ± 92.4KB    3.01MB … 3.90MB        474 ( 9%)        💩+122.9% ±  0.2%
+  cpu_cycles         1.43M  ±  348K     1.16M  … 3.05M         452 ( 8%)        💩+768.6% ±  5.4%
+  instructions       2.53M  ± 40.8      2.53M  … 2.53M         190 ( 3%)        💩+1875.0% ±  0.0%
+  cache_references   57.4K  ± 3.10K     45.6K  … 95.0K         217 ( 4%)        💩+439.8% ±  0.8%
+  cache_misses       14.3K  ± 1.53K     11.4K  … 22.2K         349 ( 6%)        💩+223.3% ±  0.9%
+  branch_misses      14.0K  ±  108      13.1K  … 14.6K         234 ( 4%)        💩+484.9% ±  0.1%
+Benchmark 17 (5590 runs): ./get_cpu_power_usageCPP_gcc_optimized_no_lto
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.7ms ±  157us    10.5ms … 11.4ms         11 ( 0%)        💩+  3.9% ±  0.0%
+  peak_rss           3.64MB ± 89.4KB    3.10MB … 3.91MB        428 ( 8%)        💩+123.4% ±  0.2%
+  cpu_cycles         1.38M  ±  309K     1.19M  … 2.97M        1150 (21%)        💩+739.2% ±  4.8%
+  instructions       2.55M  ± 26.3      2.55M  … 2.55M          39 ( 1%)        💩+1892.9% ±  0.0%
+  cache_references   57.2K  ± 2.78K     46.2K  …  107K         367 ( 7%)        💩+437.3% ±  0.7%
+  cache_misses       13.9K  ± 1.42K     11.8K  … 22.5K         375 ( 7%)        💩+214.9% ±  0.8%
+  branch_misses      14.6K  ±  110      13.8K  … 15.2K         271 ( 5%)        💩+511.5% ±  0.1%
+Benchmark 18 (5579 runs): ./get_cpu_power_usageCPP_clang_optimized_no_lto
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.7ms ±  160us    10.5ms … 11.9ms         16 ( 0%)        💩+  4.1% ±  0.0%
+  peak_rss           3.65MB ± 85.6KB    3.17MB … 3.94MB        373 ( 7%)        💩+123.6% ±  0.2%
+  cpu_cycles         1.42M  ±  328K     1.19M  … 3.26M        1016 (18%)        💩+761.2% ±  5.1%
+  instructions       2.55M  ± 42.0      2.55M  … 2.55M         191 ( 3%)        💩+1892.9% ±  0.0%
+  cache_references   57.4K  ± 2.99K     49.2K  …  112K         281 ( 5%)        💩+439.0% ±  0.7%
+  cache_misses       14.0K  ± 1.37K     11.9K  … 21.2K         362 ( 6%)        💩+216.3% ±  0.8%
+  branch_misses      14.6K  ±  106      13.7K  … 15.2K         244 ( 4%)        💩+511.7% ±  0.1%
+Benchmark 19 (5585 runs): ./get_cpu_power_usageGO
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.7ms ± 87.3us    10.5ms … 11.4ms         59 ( 1%)        💩+  4.0% ±  0.0%
+  peak_rss           3.70MB ±  245KB    2.98MB … 5.91MB       1889 (34%)        💩+126.8% ±  0.4%
+  cpu_cycles          488K  ± 77.0K      337K  …  884K         242 ( 4%)        💩+196.6% ±  1.2%
+  instructions        539K  ± 12.0K      501K  …  606K         171 ( 3%)        💩+320.5% ±  0.2%
+  cache_references   43.9K  ± 2.83K     35.8K  … 56.7K          30 ( 1%)        💩+312.7% ±  0.7%
+  cache_misses       14.8K  ± 1.85K     9.59K  … 23.6K          34 ( 1%)        💩+233.6% ±  1.1%
+  branch_misses      4.12K  ±  448      2.96K  … 5.39K           0 ( 0%)        💩+ 72.5% ±  0.5%
+Benchmark 20 (5583 runs): ./get_cpu_power_usageGO_optimized
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.7ms ±  124us    10.5ms … 17.5ms         53 ( 1%)        💩+  4.1% ±  0.0%
+  peak_rss           3.69MB ±  237KB    2.98MB … 5.91MB       2016 (36%)        💩+126.4% ±  0.4%
+  cpu_cycles          498K  ± 75.6K      350K  … 1.18M         280 ( 5%)        💩+202.6% ±  1.2%
+  instructions        539K  ± 11.6K      499K  …  610K         169 ( 3%)        💩+320.5% ±  0.2%
+  cache_references   44.3K  ± 2.80K     36.9K  … 55.4K          23 ( 0%)        💩+316.4% ±  0.7%
+  cache_misses       14.9K  ± 1.85K     9.98K  … 22.8K          23 ( 0%)        💩+236.2% ±  1.1%
+  branch_misses      4.11K  ±  439      3.05K  … 5.47K           0 ( 0%)        💩+ 72.1% ±  0.5%
+Benchmark 21 (5755 runs): ./get_cpu_power_usageRS
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.4ms ± 76.9us    10.3ms … 11.4ms         64 ( 1%)          +  0.9% ±  0.0%
+  peak_rss           2.05MB ± 77.6KB    1.46MB … 2.25MB        476 ( 8%)        💩+ 25.8% ±  0.2%
+  cpu_cycles          281K  ± 46.8K      251K  …  653K         808 (14%)        💩+ 70.8% ±  0.8%
+  instructions        306K  ±  337       305K  …  308K          45 ( 1%)        💩+138.5% ±  0.0%
+  cache_references   18.1K  ±  638      16.8K  … 22.5K         430 ( 7%)        💩+ 70.0% ±  0.2%
+  cache_misses       6.79K  ±  501      5.52K  … 9.46K         216 ( 4%)        💩+ 53.4% ±  0.3%
+  branch_misses      3.81K  ± 53.0      3.21K  … 4.06K         205 ( 4%)        💩+ 59.4% ±  0.1%
+Benchmark 22 (5765 runs): ./get_cpu_power_usageRS_optimized
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.4ms ± 71.7us    10.3ms … 10.9ms        232 ( 4%)          +  0.8% ±  0.0%
+  peak_rss           2.02MB ± 99.0KB    1.44MB … 2.15MB        795 (14%)        💩+ 23.6% ±  0.2%
+  cpu_cycles          269K  ± 41.8K      242K  …  706K         940 (16%)        💩+ 63.6% ±  0.7%
+  instructions        297K  ±  334       296K  …  299K          29 ( 1%)        💩+131.5% ±  0.0%
+  cache_references   17.3K  ±  634      14.8K  … 21.3K         481 ( 8%)        💩+ 62.4% ±  0.2%
+  cache_misses       6.42K  ±  441      5.74K  … 9.03K         348 ( 6%)        💩+ 45.0% ±  0.3%
+  branch_misses      3.68K  ± 50.3      3.02K  … 3.97K         163 ( 3%)        💩+ 53.9% ±  0.1%
+Benchmark 23 (5822 runs): ./get_cpu_power_usageZIG
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.3ms ± 47.9us    10.2ms … 12.2ms        127 ( 2%)          -  0.2% ±  0.0%
+  peak_rss            923KB ± 23.2KB     610KB … 1.00MB         79 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         52.5K  ± 11.4K     34.9K  …  113K         162 ( 3%)        ⚡- 68.1% ±  0.3%
+  instructions       24.5K  ±  168      24.1K  … 24.7K        1904 (33%)        ⚡- 80.9% ±  0.0%
+  cache_references   3.99K  ±  383      2.76K  … 5.64K           8 ( 0%)        ⚡- 62.5% ±  0.1%
+  cache_misses       1.52K  ±  303       345   … 2.85K           4 ( 0%)        ⚡- 65.8% ±  0.2%
+  branch_misses       341   ± 78.2       149   …  511            0 ( 0%)        ⚡- 85.7% ±  0.1%
+Benchmark 24 (5854 runs): ./get_cpu_power_usageZIG_optimized
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.2ms ± 28.1us    10.1ms … 10.8ms        168 ( 3%)          -  0.8% ±  0.0%
+  peak_rss            923KB ± 29.3KB     549KB …  926KB         68 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         6.94K  ± 1.38K     4.76K  … 16.6K         203 ( 3%)        ⚡- 95.8% ±  0.3%
+  instructions       2.56K  ±  118      2.32K  … 2.75K        1877 (32%)        ⚡- 98.0% ±  0.0%
+  cache_references    527   ± 53.8       317   …  764           59 ( 1%)        ⚡- 95.1% ±  0.1%
+  cache_misses        221   ± 68.8        48   …  416            0 ( 0%)        ⚡- 95.0% ±  0.2%
+  branch_misses      86.1   ± 16.0        40   …  112            0 ( 0%)        ⚡- 96.4% ±  0.0%
+Benchmark 25 (564 runs): ./get_cpu_power_usage.py
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time           107ms ±  583us     105ms …  115ms          3 ( 1%)        💩+932.6% ±  0.2%
+  peak_rss           11.1MB ±  217KB    9.95MB … 11.5MB         10 ( 2%)        💩+579.1% ±  0.6%
+  cpu_cycles         25.1M  ± 1.48M     22.1M  … 29.8M           3 ( 1%)        💩+15146.2% ± 23.1%
+  instructions       39.2M  ± 40.3K     39.1M  … 39.4M           3 ( 1%)        💩+30524.4% ±  0.8%
+  cache_references   1.96M  ± 24.7K     1.79M  … 2.04M           7 ( 1%)        💩+18279.6% ±  6.0%
+  cache_misses        252K  ± 12.3K      229K  …  292K           3 ( 1%)        💩+5583.3% ±  7.1%
+  branch_misses       349K  ± 3.66K      342K  …  368K          13 ( 2%)        💩+14477.8% ±  3.9%
+Benchmark 26 (581 runs): ./get_cpu_power_usage.sh
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time           103ms ±  263us     102ms …  104ms         13 ( 2%)        💩+901.3% ±  0.1%
+  peak_rss           5.03MB ±  133KB    4.46MB … 5.30MB         44 ( 8%)        💩+208.4% ±  0.5%
+  cpu_cycles         4.04M  ±  287K     3.12M  … 5.19M          24 ( 4%)        💩+2358.6% ±  4.6%
+  instructions       4.47M  ±  301      4.47M  … 4.47M          42 ( 7%)        💩+3387.6% ±  0.0%
+  cache_references    199K  ± 4.06K      188K  …  218K          19 ( 3%)        💩+1772.9% ±  1.0%
+  cache_misses       72.6K  ± 2.36K     65.1K  … 78.1K           6 ( 1%)        💩+1540.5% ±  1.5%
+  branch_misses      43.1K  ±  358      41.6K  … 43.9K          13 ( 2%)        💩+1702.5% ±  0.4%
+Benchmark 27 (5867 runs): ./get_cpu_power_usageASM
+  measurement          mean ± σ            min … max           outliers         delta
+  wall_time          10.2ms ± 28.7us    10.1ms … 11.3ms        120 ( 2%)          -  1.0% ±  0.0%
+  peak_rss            924KB ± 21.1KB     614KB …  926KB         41 ( 1%)        ⚡- 43.4% ±  0.2%
+  cpu_cycles         1.37K  ±  499       901   … 6.82K         575 (10%)        ⚡- 99.2% ±  0.3%
+  instructions        522   ± 1.52       522   …  540           76 ( 1%)        ⚡- 99.6% ±  0.0%
+  cache_references    122   ± 24.8        33   …  235           42 ( 1%)        ⚡- 98.9% ±  0.1%
+  cache_misses       20.9   ± 17.1         0   …  118          118 ( 2%)        ⚡- 99.5% ±  0.1%
+  branch_misses      12.1   ± 3.20         8   …   27          427 ( 7%)        ⚡- 99.5% ±  0.0%
 ```
 </details>
 
